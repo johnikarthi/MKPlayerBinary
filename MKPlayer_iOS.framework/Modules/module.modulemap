@@ -1,4 +1,0 @@
-framework module MKPlayer_iOS {
-  header "MKPlayer_iOS-Swift.h"
-  requires objc
-}
