@@ -1,6 +1,0 @@
-framework module MKPlayer {
-  umbrella header "MKPlayer.h"
-
-  export *
-  module * { export * }
-}
