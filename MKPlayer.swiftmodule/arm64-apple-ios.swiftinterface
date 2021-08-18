@@ -1,0 +1,991 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 5.3.2 (swiftlang-1200.0.45 clang-1200.0.32.28)
+// swift-module-flags: -target arm64-apple-ios12.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name MKPlayer
+import AVFoundation
+import AVKit
+import Alamofire
+import BitmovinAnalyticsCollector
+import BitmovinPlayer
+import Foundation
+@_exported import MKPlayer
+import Network
+import Swift
+import UIKit
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPTimeShiftEvent : MKPlayer.MKPEvent {
+  final public let position: Foundation.TimeInterval
+  final public let target: Foundation.TimeInterval
+  final public let timeShift: Foundation.TimeInterval
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(position: Foundation.TimeInterval, target: Foundation.TimeInterval, timeShift: Foundation.TimeInterval)
+  @objc deinit
+}
+public protocol MKPMetadaEntry : ObjectiveC.NSObjectProtocol {
+  var metadataType: MKPlayer.MKPMetadataType { get }
+}
+@objc @_inheritsConvenienceInitializers public class MKPMetadataParsedEvent : MKPlayer.MKPMetadataEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  override public init(metadata: MKPlayer.MKPMetadata, type: MKPlayer.MKPMetadataType)
+}
+@objc public class MKPSubtitleTrack : MKPlayer.MKPTrack {
+  public var language: Swift.String? {
+    get
+  }
+  public init(url: Foundation.URL?, label: Swift.String, identifier: Swift.String, isDefaultTrack: Swift.Bool = false, language: Swift.String?)
+  @objc deinit
+  override public init(url: Foundation.URL?, trackType: MKPlayer.MKPTrackType, label: Swift.String, identifier: Swift.String, isDefaultTrack: Swift.Bool = super)
+}
+public protocol MKPPlayerAPI {
+  var isDestroyed: Swift.Bool { get }
+  var isMuted: Swift.Bool { get }
+  var volume: Swift.Int { get set }
+  var isPaused: Swift.Bool { get }
+  var isPlaying: Swift.Bool { get }
+  var isLive: Swift.Bool { get }
+  var duration: Foundation.TimeInterval { get }
+  var currentTime: Foundation.TimeInterval { get }
+  var getSeekableRange: MKPlayer.MKPTimeRange? { get }
+  var getCurrentLiveProgramTimeRange: MKPlayer.MKPTimeRange? { get }
+  var config: MKPlayer.MKPPlayerConfiguration { get }
+  var maxTimeShift: Foundation.TimeInterval { get }
+  var timeShift: Foundation.TimeInterval { get set }
+  var getAvailableSubtitleTracks: [MKPlayer.MKPSubtitleTrack] { get }
+  var getCurrentSubtitleTrack: MKPlayer.MKPSubtitleTrack { get }
+  var getAvailableAudioTracks: [MKPlayer.MKPAudioTrack] { get }
+  var getCurrentAudioTrack: MKPlayer.MKPAudioTrack? { get }
+  var isAd: Swift.Bool { get }
+  var isAirPlayActive: Swift.Bool { get }
+  var isAirPlayAvailable: Swift.Bool { get }
+  var playbackSpeed: Swift.Float { get set }
+  var bufferLevel: Swift.Double { get }
+  var streamType: MKPlayer.MKPMediaSourceType { get }
+  var maxSelectableBitrate: Swift.UInt { get set }
+  var currentVideoFrameRate: Swift.Float { get }
+  var availableVideoQualities: [MKPlayer.MKPVideoQuality] { get }
+  var videoQuality: MKPlayer.MKPVideoQuality? { get }
+  var scalingMode: MKPlayer.MKPScalingMode { get set }
+  var isPictureInPicture: Swift.Bool { get }
+  var isPictureInPictureAvailable: Swift.Bool { get }
+  func load(sourceConfiguration: MKPlayer.MKPSourceConfiguration)
+  func unload()
+  func destroy()
+  func play()
+  func pause()
+  func setBufferTargetLevel(value: Foundation.TimeInterval)
+  func seek(time: Foundation.TimeInterval)
+  func mute()
+  func unmute()
+  func removeSubtitle(trackIdentifier subtitleTrackID: Swift.String)
+  func setSubtitle(trackIdentifier subtitleTrackID: Swift.String?)
+  func setAudio(trackIdentifier audioTrackID: Swift.String)
+  func currentTime(_ timeMode: MKPlayer.MKPTimeMode) -> Foundation.TimeInterval
+  func enterPictureInPicture()
+  func exitPictureInPicture()
+}
+public struct MKPSourceOptions : Swift.Codable {
+  public let startOffset: Foundation.TimeInterval
+  public let startOffsetTimelineReference: MKPlayer.MKPTimelineReferencePoint?
+  public init(startOffset: Foundation.TimeInterval, startOffsetTimelineReference: MKPlayer.MKPTimelineReferencePoint? = nil)
+  public init(from decoder: Swift.Decoder) throws
+  public func encode(to encoder: Swift.Encoder) throws
+}
+public protocol MKPPictureInPictureListener : AnyObject {
+  func onPictureInPictureEnter(event: MKPlayer.MKPPictureInPictureEnterEvent)
+  func onPictureInPictureEntered(event: MKPlayer.MKPPictureInPictureEnteredEvent)
+  func onPictureInPictureExit(event: MKPlayer.MKPPictureInPictureExitEvent)
+  func onPictureInPictureExited(event: MKPlayer.MKPPictureInPictureExitedEvent)
+}
+extension MKPPictureInPictureListener {
+  public func onPictureInPictureEnter(event: MKPlayer.MKPPictureInPictureEnterEvent)
+  public func onPictureInPictureEntered(event: MKPlayer.MKPPictureInPictureEnteredEvent)
+  public func onPictureInPictureExit(event: MKPlayer.MKPPictureInPictureExitEvent)
+  public func onPictureInPictureExited(event: MKPlayer.MKPPictureInPictureExitedEvent)
+}
+@objc public class MKPSubtitleChangedEvent : MKPlayer.MKPEvent {
+  final public let subtitleTrackOld: MKPlayer.MKPSubtitleTrack?
+  final public let subtitleTrackNew: MKPlayer.MKPSubtitleTrack?
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(subtitleTrackOld: MKPlayer.MKPSubtitleTrack?, subtitleTrackNew: MKPlayer.MKPSubtitleTrack?)
+  @objc deinit
+  @objc override dynamic public init()
+}
+@objc @_inheritsConvenienceInitializers public class MKPUnmutedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  @objc override dynamic public init()
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPAirPlayChangedEvent : MKPlayer.MKPEvent {
+  final public let isAirPlayActive: Swift.Bool
+  final public let time: Foundation.TimeInterval
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(isAirPlayActive: Swift.Bool = false, time: Foundation.TimeInterval = 0.0)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class MKPPictureInPictureEnteredEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  @objc override dynamic public init()
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPScteMetadataEntry : ObjectiveC.NSObject, MKPlayer.MKPMetadaEntry {
+  public var metadataType: MKPlayer.MKPMetadataType {
+    get
+  }
+  final public let key: Swift.String
+  final public let value: Swift.String?
+  public init(key: Swift.String, value: Swift.String?)
+  @objc deinit
+}
+public struct MKPAnalyticsConfiguration : Swift.Codable {
+  public let key: Swift.String
+  public var experimentName: Swift.String?
+  public var customerUserId: Swift.String?
+  public var customData1: Swift.String?
+  public var customData2: Swift.String?
+  public var customData3: Swift.String?
+  public var customData4: Swift.String?
+  public var customData5: Swift.String?
+  public init(key: Swift.String, experimentName: Swift.String? = nil, customerUserId: Swift.String? = nil, customData1: Swift.String? = nil, customData2: Swift.String? = nil, customData3: Swift.String? = nil, customData4: Swift.String? = nil, customData5: Swift.String? = nil)
+  public init(from decoder: Swift.Decoder) throws
+  public func encode(to encoder: Swift.Encoder) throws
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPMetadataEvent : MKPlayer.MKPEvent {
+  final public let metadata: MKPlayer.MKPMetadata
+  final public let metadataType: MKPlayer.MKPMetadataType
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(metadata: MKPlayer.MKPMetadata, type: MKPlayer.MKPMetadataType)
+  @objc deinit
+}
+final public class MKPPlayerConfiguration : Swift.Equatable {
+  final public var isAutoplayEnabled: Swift.Bool {
+    get
+    set
+  }
+  final public var isUiEnabled: Swift.Bool {
+    get
+    set
+  }
+  final public var isLoggingEnabled: Swift.Bool
+  final public var isMuted: Swift.Bool {
+    get
+    set
+  }
+  final public var isTimeShiftEnabled: Swift.Bool {
+    get
+    set
+  }
+  final public var isBackgroundPlaybackEnabled: Swift.Bool {
+    get
+    set
+  }
+  final public var isPictureInPictureEnabled: Swift.Bool {
+    get
+    set
+  }
+  final public var isNativeHlsParsingEnabled: Swift.Bool {
+    get
+    set
+  }
+  final public var isCustomHlsLoadingEnabled: Swift.Bool {
+    get
+    set
+  }
+  final public var timeChangedInterval: Swift.Double {
+    get
+    set
+  }
+  final public var disableSubtitleTracksWhileSeeking: Swift.Bool {
+    get
+    set
+  }
+  final public var maxSelectableBitrate: Swift.UInt {
+    get
+    set
+  }
+  final public var audioAndVideoForwardBufferDuration: Swift.Double {
+    get
+    set
+  }
+  final public var key: Swift.String? {
+    get
+    set
+  }
+  final public var backendConfiguration: MKPlayer.MKPBackendConfiguration?
+  public init()
+  public static func == (lhs: MKPlayer.MKPPlayerConfiguration, rhs: MKPlayer.MKPPlayerConfiguration) -> Swift.Bool
+  @objc deinit
+}
+public class MKPVideoQuality : MKPlayer.MKPQuality {
+  final public let width: Swift.UInt
+  final public let height: Swift.UInt
+  public init(identifier: Swift.String, label: Swift.String, bitrate: Swift.UInt, codec: Swift.String?, width: Swift.UInt, height: Swift.UInt)
+  @objc deinit
+  override public init(identifier: Swift.String, label: Swift.String, bitrate: Swift.UInt, codec: Swift.String?)
+}
+public enum MKPProgramRestriction : Swift.Int {
+  case wifi
+  case cellular
+  case phone
+  case tablet
+  case stb
+  case jailbroken
+  case outOfHome
+  case iOS
+  case rewind
+  case fastForward
+  case pause
+  case resume
+  case seekForward
+  case seekBackward
+  case restart
+  case timeshift
+  case extendedDisplay
+  case airplay
+  public var code: Swift.String {
+    get
+  }
+  public var message: Swift.String {
+    get
+  }
+  public typealias RawValue = Swift.Int
+  public init?(rawValue: Swift.Int)
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum MKPTimeMode : Swift.UInt {
+  case relativeTime
+  case absoluteTime
+  public typealias RawValue = Swift.UInt
+  public init?(rawValue: Swift.UInt)
+  public var rawValue: Swift.UInt {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers public class MKPSourceWillUnloadEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  @objc override dynamic public init()
+}
+@objc @_inheritsConvenienceInitializers public class MKPDestroyEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  @objc override dynamic public init()
+}
+public class MKPQuality {
+  final public let identifier: Swift.String
+  final public let label: Swift.String
+  final public let bitrate: Swift.UInt
+  final public let codec: Swift.String?
+  public init(identifier: Swift.String, label: Swift.String, bitrate: Swift.UInt, codec: Swift.String?)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class MKPAdFinishedEvent : MKPlayer.MKPAdEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  override public init(data: Swift.String)
+}
+public enum MKPAdQuartile : Swift.Int {
+  case firstQuartile
+  case midpoint
+  case thirdQuartile
+  public typealias RawValue = Swift.Int
+  public init?(rawValue: Swift.Int)
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers public class MKPRenderFirstFrameEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  @objc override dynamic public init()
+}
+@objc @_inheritsConvenienceInitializers public class MKPEvent : ObjectiveC.NSObject, Swift.Error {
+  public var eventType: Swift.String {
+    get
+  }
+  public var timestamp: Foundation.TimeInterval {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+public struct MKPTimeRange {
+  public let start: Foundation.TimeInterval
+  public let end: Foundation.TimeInterval
+  public let duration: Foundation.TimeInterval
+  public init(currentTime: Foundation.TimeInterval, currentTimeShift: Foundation.TimeInterval, maxTimeShift: Foundation.TimeInterval, currentProgramStartTime: Foundation.TimeInterval?)
+  public init(duration: Foundation.TimeInterval)
+  public init(currentProgramStartTime: Foundation.Date, currentProgramEndTime: Foundation.Date)
+}
+@objc public class MKPVideoDownloadQualityChangedEvent : MKPlayer.MKPEvent {
+  final public let videoQualityOld: MKPlayer.MKPVideoQuality?
+  final public let videoQualityNew: MKPlayer.MKPVideoQuality?
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(videoQualityOld: MKPlayer.MKPVideoQuality?, videoQualityNew: MKPlayer.MKPVideoQuality?)
+  @objc deinit
+  @objc override dynamic public init()
+}
+@objc @_inheritsConvenienceInitializers public class MKPPlaybackFinishedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  @objc override dynamic public init()
+}
+@objc @_inheritsConvenienceInitializers public class MKPPlayerEventDispatcher : ObjectiveC.NSObject {
+  public func addEvent(listener: MKPlayer.MKPPlayerEventListener)
+  public func removeEvent(listener: MKPlayer.MKPPlayerEventListener)
+  public func removeAllEventListeners()
+  @objc deinit
+  @objc override dynamic public init()
+}
+extension MKPPlayerEventDispatcher : BitmovinPlayer.PlayerListener {
+  @objc dynamic public func onAirPlayAvailable(_ event: BitmovinPlayer.AirPlayAvailableEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onAirPlayChanged(_ event: BitmovinPlayer.AirPlayChangedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onSourceError(_ event: BitmovinPlayer.SourceErrorEvent, player: BitmovinPlayer.Player)
+  public func onError(_ event: MKPlayer.MKPErrorEvent)
+  @objc dynamic public func onMuted(_ event: BitmovinPlayer.MutedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onPaused(_ event: BitmovinPlayer.PausedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onPlay(_ event: BitmovinPlayer.PlayEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onPlaybackFinished(_ event: BitmovinPlayer.PlaybackFinishedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onPlaying(_ event: BitmovinPlayer.PlayingEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onReady(_ event: BitmovinPlayer.ReadyEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onSeek(_ event: BitmovinPlayer.SeekEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onSeeked(_ event: BitmovinPlayer.SeekedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onSourceLoaded(_ event: BitmovinPlayer.SourceLoadedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onSourceUnloaded(_ event: BitmovinPlayer.SourceUnloadedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onUnmuted(_ event: BitmovinPlayer.UnmutedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onTimeChanged(_ event: BitmovinPlayer.TimeChangedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onDurationChanged(_ event: BitmovinPlayer.DurationChangedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onMetadata(_ event: BitmovinPlayer.MetadataEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onMetadataParsed(_ event: BitmovinPlayer.MetadataParsedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onTimeShift(_ event: BitmovinPlayer.TimeShiftEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onTimeShifted(_ event: BitmovinPlayer.TimeShiftedEvent, player: BitmovinPlayer.Player)
+  public func onDvrWindowExceeded(_ event: BitmovinPlayer.DvrWindowExceededEvent)
+  @objc dynamic public func onStallStarted(_ event: BitmovinPlayer.StallStartedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onStallEnded(_ event: BitmovinPlayer.StallEndedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onVideoSizeChanged(_ event: BitmovinPlayer.VideoSizeChangedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onRenderFirstFrame(_ event: BitmovinPlayer.RenderFirstFrameEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onSubtitleChanged(_ event: BitmovinPlayer.SubtitleChangedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onAudioChanged(_ event: BitmovinPlayer.AudioChangedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onVideoDownloadQualityChanged(_ event: BitmovinPlayer.VideoDownloadQualityChangedEvent, player: BitmovinPlayer.Player)
+  @objc dynamic public func onDestroy(_ event: BitmovinPlayer.DestroyEvent, player: BitmovinPlayer.Player)
+  public func onScalingModeChanged(_ event: MKPlayer.MKPScalingModeChangedEvent, player: BitmovinPlayer.Player)
+}
+@objc @_inheritsConvenienceInitializers public class MKPAirPlayAvailableEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+public enum MKPMediaSourceType : Swift.Int {
+  case none
+  case hls
+  case dash
+  case progressive
+  public typealias RawValue = Swift.Int
+  public init?(rawValue: Swift.Int)
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers public class MKPPictureInPictureEnterEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  @objc override dynamic public init()
+}
+@objc @_inheritsConvenienceInitializers public class MKPPlayingEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class MKPPictureInPictureExitEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  @objc override dynamic public init()
+}
+@objc public class MKPScalingModeChangedEvent : MKPlayer.MKPEvent {
+  final public let scalingModeOld: MKPlayer.MKPScalingMode?
+  final public let scalingModeNew: MKPlayer.MKPScalingMode?
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(scalingModeOld: MKPlayer.MKPScalingMode?, scalingModeNew: MKPlayer.MKPScalingMode?)
+  @objc deinit
+  @objc override dynamic public init()
+}
+@objc @_inheritsConvenienceInitializers public class MKPAdStartedEvent : MKPlayer.MKPAdEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  override public init(data: Swift.String)
+}
+@objc @_inheritsConvenienceInitializers public class MKPDvrWindowExceededEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPAdMarkerEvent : MKPlayer.MKPEvent {
+  public init(position: Foundation.TimeInterval, duration: Swift.Double)
+  @objc deinit
+}
+public enum MKPTimelineReferencePoint : Swift.Int, Swift.Codable {
+  case auto
+  case start
+  case end
+  public typealias RawValue = Swift.Int
+  public init?(rawValue: Swift.Int)
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum MKPTrackType : Swift.Int {
+  case none
+  case text
+  case thumbnail
+  case audio
+  public typealias RawValue = Swift.Int
+  public init?(rawValue: Swift.Int)
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPProgramRestrictionsEvent : MKPlayer.MKPEvent {
+  final public let restrictions: [MKPlayer.MKPProgramRestriction]
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(_ restrictions: [MKPlayer.MKPProgramRestriction])
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPPlayEvent : MKPlayer.MKPEvent {
+  final public let time: Foundation.TimeInterval
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(time: Foundation.TimeInterval)
+  @objc deinit
+}
+public enum MKPMetadataType : Swift.Int {
+  case none
+  case id3
+  case emsg
+  case daterange
+  case scte35
+  public typealias RawValue = Swift.Int
+  public init?(rawValue: Swift.Int)
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc public class MKPAudioChangedEvent : MKPlayer.MKPEvent {
+  final public let audioTrackOld: MKPlayer.MKPAudioTrack?
+  final public let audioTrackNew: MKPlayer.MKPAudioTrack?
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(audioTrackOld: MKPlayer.MKPAudioTrack?, audioTrackNew: MKPlayer.MKPAudioTrack?)
+  @objc override dynamic public init()
+  @objc deinit
+}
+public struct MKPCdnOptions : Swift.Codable {
+  public var cdnTokens: [Swift.String : Swift.String]
+  public var cdnFailoverPercent: Swift.UInt8
+  public init()
+  public init(cdnTokens: [Swift.String : Swift.String] = [String: String](), cdnFailoverPercent: Swift.UInt8 = 0)
+  public init(from decoder: Swift.Decoder) throws
+  public func encode(to encoder: Swift.Encoder) throws
+}
+@objc @_inheritsConvenienceInitializers public class MKPVideoSizeChangedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class MKPSourceUnloadedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+final public class MKPSourceConfiguration : Swift.Codable, Swift.Equatable {
+  final public let isLive: Swift.Bool?
+  final public let sourceUrl: Swift.String?
+  final public let mediaId: Swift.String?
+  final public let applicationToken: Swift.String?
+  final public var title: Swift.String?
+  final public var sourceOptions: MKPlayer.MKPSourceOptions?
+  final public var cdnOptions: MKPlayer.MKPCdnOptions?
+  final public var analyticsConfiguration: MKPlayer.MKPAnalyticsConfiguration?
+  public init(sourceUrl: Swift.String, isLive: Swift.Bool, title: Swift.String? = nil, sourceOptions: MKPlayer.MKPSourceOptions? = nil, analyticsConfiguration: MKPlayer.MKPAnalyticsConfiguration? = nil)
+  public init(mediaId: Swift.String, isLive: Swift.Bool, applicationToken: Swift.String? = nil, title: Swift.String? = nil, sourceOptions: MKPlayer.MKPSourceOptions? = nil, cdnOptions: MKPlayer.MKPCdnOptions? = nil, analyticsConfiguration: MKPlayer.MKPAnalyticsConfiguration? = nil)
+  public static func == (lhs: MKPlayer.MKPSourceConfiguration, rhs: MKPlayer.MKPSourceConfiguration) -> Swift.Bool
+  @objc deinit
+  public init(from decoder: Swift.Decoder) throws
+  final public func encode(to encoder: Swift.Encoder) throws
+}
+@objc @_inheritsConvenienceInitializers public class MKPStallEndedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+public protocol MKPFullscreenHandler : AnyObject {
+  var fullscreen: Swift.Bool { get }
+  func onFullscreenRequested()
+  func onFullscreenExitRequested()
+}
+public enum MKPScalingMode : Swift.Int {
+  case fit
+  case zoom
+  case stretch
+  public typealias RawValue = Swift.Int
+  public init?(rawValue: Swift.Int)
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc public class MKPPlayer : MKPlayer.MKPPlayerEventDispatcher {
+  weak public var fullscreenHandlerDelegate: MKPlayer.MKPFullscreenHandler? {
+    get
+    set
+  }
+  public func addListener(forPictureInPicture listener: MKPlayer.MKPPictureInPictureListener)
+  public init(parentView: UIKit.UIView, configuration: MKPlayer.MKPPlayerConfiguration)
+  public func updateAuthToken(authToken: Swift.String)
+  @objc deinit
+  @objc override dynamic public init()
+}
+extension MKPPlayer : MKPlayer.MKPPlayerAPI {
+  public var isDestroyed: Swift.Bool {
+    get
+  }
+  public var isMuted: Swift.Bool {
+    get
+  }
+  public var volume: Swift.Int {
+    get
+    set
+  }
+  public var isPaused: Swift.Bool {
+    get
+  }
+  public var isPlaying: Swift.Bool {
+    get
+  }
+  public var isLive: Swift.Bool {
+    get
+  }
+  public var duration: Foundation.TimeInterval {
+    get
+  }
+  public var currentTime: Foundation.TimeInterval {
+    get
+  }
+  public var getSeekableRange: MKPlayer.MKPTimeRange? {
+    get
+  }
+  public var getCurrentLiveProgramTimeRange: MKPlayer.MKPTimeRange? {
+    get
+  }
+  public var config: MKPlayer.MKPPlayerConfiguration {
+    get
+  }
+  public var maxTimeShift: Foundation.TimeInterval {
+    get
+  }
+  public var timeShift: Foundation.TimeInterval {
+    get
+    set
+  }
+  public var getAvailableSubtitleTracks: [MKPlayer.MKPSubtitleTrack] {
+    get
+  }
+  public var getCurrentSubtitleTrack: MKPlayer.MKPSubtitleTrack {
+    get
+  }
+  public var getAvailableAudioTracks: [MKPlayer.MKPAudioTrack] {
+    get
+  }
+  public var getCurrentAudioTrack: MKPlayer.MKPAudioTrack? {
+    get
+  }
+  public var isAd: Swift.Bool {
+    get
+  }
+  public var isAirPlayActive: Swift.Bool {
+    get
+  }
+  public var isAirPlayAvailable: Swift.Bool {
+    get
+  }
+  public var playbackSpeed: Swift.Float {
+    get
+    set
+  }
+  public var bufferLevel: Foundation.TimeInterval {
+    get
+  }
+  public var streamType: MKPlayer.MKPMediaSourceType {
+    get
+  }
+  public var maxSelectableBitrate: Swift.UInt {
+    get
+    set
+  }
+  public var currentVideoFrameRate: Swift.Float {
+    get
+  }
+  public var availableVideoQualities: [MKPlayer.MKPVideoQuality] {
+    get
+  }
+  public var videoQuality: MKPlayer.MKPVideoQuality? {
+    get
+  }
+  public var scalingMode: MKPlayer.MKPScalingMode {
+    get
+    set
+  }
+  public var fullscreen: Swift.Bool {
+    get
+  }
+  public func load(sourceConfiguration: MKPlayer.MKPSourceConfiguration)
+  public func unload()
+  public func destroy()
+  public func play()
+  public func pause()
+  public func setBufferTargetLevel(value: Foundation.TimeInterval)
+  public func seek(time: Foundation.TimeInterval)
+  public func mute()
+  public func unmute()
+  public var isPictureInPicture: Swift.Bool {
+    get
+  }
+  public var isPictureInPictureAvailable: Swift.Bool {
+    get
+  }
+  public func removeSubtitle(trackIdentifier subtitleTrackID: Swift.String)
+  public func setSubtitle(trackIdentifier subtitleTrackID: Swift.String?)
+  public func setAudio(trackIdentifier audioTrackID: Swift.String)
+  public func currentTime(_ timeMode: MKPlayer.MKPTimeMode) -> Foundation.TimeInterval
+  public func enterFullscreen()
+  public func exitFullscreen()
+  public func showAirPlayTargetPicker()
+  public func enterPictureInPicture()
+  public func exitPictureInPicture()
+}
+extension MKPPlayer {
+  @objc override dynamic public func onSourceLoaded(_ event: BitmovinPlayer.SourceLoadedEvent, player: BitmovinPlayer.Player)
+  @objc override dynamic public func onSourceUnloaded(_ event: BitmovinPlayer.SourceUnloadedEvent, player: BitmovinPlayer.Player)
+  @objc override dynamic public func onDestroy(_ event: BitmovinPlayer.DestroyEvent, player: BitmovinPlayer.Player)
+  @objc override dynamic public func onDurationChanged(_ event: BitmovinPlayer.DurationChangedEvent, player: BitmovinPlayer.Player)
+  @objc override dynamic public func onMetadataParsed(_ event: BitmovinPlayer.MetadataParsedEvent, player: BitmovinPlayer.Player)
+  @objc override dynamic public func onTimeChanged(_ event: BitmovinPlayer.TimeChangedEvent, player: BitmovinPlayer.Player)
+  @objc override dynamic public func onSeek(_ event: BitmovinPlayer.SeekEvent, player: BitmovinPlayer.Player)
+}
+extension MKPPlayer : Foundation.XMLParserDelegate {
+  @objc dynamic public func parser(_ parser: Foundation.XMLParser, didStartElement elementName: Swift.String, namespaceURI: Swift.String?, qualifiedName qName: Swift.String?, attributes attributeDict: [Swift.String : Swift.String] = [:])
+  @objc dynamic public func parser(_ parser: Foundation.XMLParser, foundCharacters string: Swift.String)
+}
+extension MKPPlayer {
+  @objc override dynamic public func observeValue(forKeyPath keyPath: Swift.String?, of object: Any?, change: [Foundation.NSKeyValueChangeKey : Any]?, context: Swift.UnsafeMutableRawPointer?)
+}
+@objc public class MKPAdQuartileEvent : MKPlayer.MKPAdEvent {
+  final public let quartile: MKPlayer.MKPAdQuartile
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(quartile: MKPlayer.MKPAdQuartile, data: Swift.String)
+  @objc deinit
+  override public init(data: Swift.String)
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPSeekEvent : MKPlayer.MKPEvent {
+  final public let position: Foundation.TimeInterval
+  final public let seekTarget: Foundation.TimeInterval
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(position: Foundation.TimeInterval, seekTarget: Foundation.TimeInterval)
+  @objc deinit
+}
+@objc public class MKPAudioTrack : MKPlayer.MKPTrack {
+  public var language: Swift.String? {
+    get
+  }
+  public init(url: Foundation.URL?, label: Swift.String, identifier: Swift.String, isDefaultTrack: Swift.Bool = false, language: Swift.String?)
+  override public init(url: Foundation.URL?, trackType: MKPlayer.MKPTrackType, label: Swift.String, identifier: Swift.String, isDefaultTrack: Swift.Bool = super)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPErrorEvent : MKPlayer.MKPEvent, MKPlayer.MKPError {
+  public var code: Swift.String
+  public var message: Swift.String
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(code: Swift.String, message: Swift.String)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class MKPReadyEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPPausedEvent : MKPlayer.MKPEvent {
+  final public let time: Foundation.TimeInterval
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(time: Foundation.TimeInterval)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class MKPPictureInPictureExitedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc deinit
+  @objc override dynamic public init()
+}
+@_hasMissingDesignatedInitializers public class MKPMetadata {
+  final public let entries: [MKPlayer.MKPMetadaEntry]
+  public init(entries: [MKPlayer.MKPMetadaEntry])
+  @objc deinit
+}
+public protocol MKPPlayerEventListener : AnyObject {
+  func onAirPlayAvailable(event: MKPlayer.MKPAirPlayAvailableEvent)
+  func onAirPlayChanged(event: MKPlayer.MKPAirPlayChangedEvent)
+  func onError(event: MKPlayer.MKPErrorEvent)
+  func onMuted(event: MKPlayer.MKPMutedEvent)
+  func onPaused(event: MKPlayer.MKPPausedEvent)
+  func onPlay(event: MKPlayer.MKPPlayEvent)
+  func onPlaybackFinished(event: MKPlayer.MKPPlaybackFinishedEvent)
+  func onPlaying(event: MKPlayer.MKPPlayingEvent)
+  func onReady(event: MKPlayer.MKPReadyEvent)
+  func onSeek(event: MKPlayer.MKPSeekEvent)
+  func onSeeked(event: MKPlayer.MKPSeekedEvent)
+  func onSourceLoaded(event: MKPlayer.MKPSourceLoadedEvent)
+  func onSourceUnloaded(event: MKPlayer.MKPSourceUnloadedEvent)
+  func onUnmuted(event: MKPlayer.MKPUnmutedEvent)
+  func onTimeChanged(event: MKPlayer.MKPTimeChangedEvent)
+  func onDurationChanged(event: MKPlayer.MKPDurationChangedEvent)
+  func onMetadata(event: MKPlayer.MKPMetadataEvent)
+  func onMetadataParsed(event: MKPlayer.MKPMetadataParsedEvent)
+  func onAdStarted(event: MKPlayer.MKPAdStartedEvent)
+  func onAdFinished(event: MKPlayer.MKPAdFinishedEvent)
+  func onAdQuartile(event: MKPlayer.MKPAdQuartileEvent)
+  func onTimeShift(event: MKPlayer.MKPTimeShiftEvent)
+  func onTimeShifted(event: MKPlayer.MKPTimeShiftedEvent)
+  func onDvrWindowExceeded(event: MKPlayer.MKPDvrWindowExceededEvent)
+  func onStallStarted(event: MKPlayer.MKPStallStartedEvent)
+  func onStallEnded(event: MKPlayer.MKPStallEndedEvent)
+  func onVideoSizeChanged(event: MKPlayer.MKPVideoSizeChangedEvent)
+  func onRenderFirstFrame(event: MKPlayer.MKPRenderFirstFrameEvent)
+  func onSourceWillUnload(event: MKPlayer.MKPSourceWillUnloadEvent)
+  func onSubtitleChanged(event: MKPlayer.MKPSubtitleChangedEvent)
+  func onAudioChanged(event: MKPlayer.MKPAudioChangedEvent)
+  func onVideoDownloadQualityChanged(event: MKPlayer.MKPVideoDownloadQualityChangedEvent)
+  func onDestroy(event: MKPlayer.MKPDestroyEvent)
+  func onScalingModeChanged(event: MKPlayer.MKPScalingModeChangedEvent)
+  func onProgramRestrictions(event: MKPlayer.MKPProgramRestrictionsEvent)
+  func onProgramTimeChanged(event: MKPlayer.MKPProgramTimeChangedEvent)
+  func onAdMarkData(event: [MKPlayer.MKPAdMarkerEvent])
+}
+extension MKPPlayerEventListener {
+  public func onAirPlayAvailable(event: MKPlayer.MKPAirPlayAvailableEvent)
+  public func onAirPlayChanged(event: MKPlayer.MKPAirPlayChangedEvent)
+  public func onError(event: MKPlayer.MKPErrorEvent)
+  public func onMuted(event: MKPlayer.MKPMutedEvent)
+  public func onPaused(event: MKPlayer.MKPPausedEvent)
+  public func onPlay(event: MKPlayer.MKPPlayEvent)
+  public func onPlaybackFinished(event: MKPlayer.MKPPlaybackFinishedEvent)
+  public func onPlaying(event: MKPlayer.MKPPlayingEvent)
+  public func onReady(event: MKPlayer.MKPReadyEvent)
+  public func onSeek(event: MKPlayer.MKPSeekEvent)
+  public func onSeeked(event: MKPlayer.MKPSeekedEvent)
+  public func onSourceLoaded(event: MKPlayer.MKPSourceLoadedEvent)
+  public func onSourceUnloaded(event: MKPlayer.MKPSourceUnloadedEvent)
+  public func onUnmuted(event: MKPlayer.MKPUnmutedEvent)
+  public func onTimeChanged(event: MKPlayer.MKPTimeChangedEvent)
+  public func onDurationChanged(event: MKPlayer.MKPDurationChangedEvent)
+  public func onMetadata(event: MKPlayer.MKPMetadataEvent)
+  public func onMetadataParsed(event: MKPlayer.MKPMetadataParsedEvent)
+  public func onAdStarted(event: MKPlayer.MKPAdStartedEvent)
+  public func onAdFinished(event: MKPlayer.MKPAdFinishedEvent)
+  public func onAdQuartile(event: MKPlayer.MKPAdQuartileEvent)
+  public func onTimeShift(event: MKPlayer.MKPTimeShiftEvent)
+  public func onTimeShifted(event: MKPlayer.MKPTimeShiftedEvent)
+  public func onDvrWindowExceeded(event: MKPlayer.MKPDvrWindowExceededEvent)
+  public func onStallStarted(event: MKPlayer.MKPStallStartedEvent)
+  public func onStallEnded(event: MKPlayer.MKPStallEndedEvent)
+  public func onVideoSizeChanged(event: MKPlayer.MKPVideoSizeChangedEvent)
+  public func onRenderFirstFrame(event: MKPlayer.MKPRenderFirstFrameEvent)
+  public func onSourceWillUnload(event: MKPlayer.MKPSourceWillUnloadEvent)
+  public func onSubtitleChanged(event: MKPlayer.MKPSubtitleChangedEvent)
+  public func onAudioChanged(event: MKPlayer.MKPAudioChangedEvent)
+  public func onVideoDownloadQualityChanged(event: MKPlayer.MKPVideoDownloadQualityChangedEvent)
+  public func onDestroy(event: MKPlayer.MKPDestroyEvent)
+  public func onScalingModeChanged(event: MKPlayer.MKPScalingModeChangedEvent)
+  public func onProgramRestrictions(event: MKPlayer.MKPProgramRestrictionsEvent)
+  public func onProgramTimeChanged(event: MKPlayer.MKPProgramTimeChangedEvent)
+  public func onAdMarkData(event: [MKPlayer.MKPAdMarkerEvent])
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPAdEvent : MKPlayer.MKPEvent {
+  final public let data: Swift.String
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(data: Swift.String)
+  @objc deinit
+}
+public struct MKPBackendConfiguration : Swift.Equatable {
+  public let serverUrl: Swift.String
+  public let authToken: Swift.String
+  public let ownerUid: Swift.String
+  public let accountId: Swift.String
+  public init(serverUrl: Swift.String, authToken: Swift.String, accountId: Swift.String, ownerUid: Swift.String = "azuki")
+  public static func == (lhs: MKPlayer.MKPBackendConfiguration, rhs: MKPlayer.MKPBackendConfiguration) -> Swift.Bool
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPProgramTimeChangedEvent : MKPlayer.MKPEvent {
+  final public let timeRange: MKPlayer.MKPTimeRange
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(startTime: Foundation.Date, endTime: Foundation.Date)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class MKPTimeShiftedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPDurationChangedEvent : MKPlayer.MKPEvent {
+  final public let duration: Foundation.TimeInterval
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(duration: Foundation.TimeInterval)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class MKPSeekedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class MKPSourceLoadedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+public protocol MKPError : Swift.Error {
+  var code: Swift.String { get }
+  var message: Swift.String { get }
+}
+@objc @_inheritsConvenienceInitializers public class MKPMutedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPTrack : ObjectiveC.NSObject {
+  public var url: Foundation.URL? {
+    get
+  }
+  public var label: Swift.String {
+    get
+  }
+  public var identifier: Swift.String {
+    get
+  }
+  public var defaultTrack: Swift.Bool {
+    get
+  }
+  public var type: MKPlayer.MKPTrackType {
+    get
+  }
+  public init(url: Foundation.URL?, trackType: MKPlayer.MKPTrackType, label: Swift.String, identifier: Swift.String, isDefaultTrack: Swift.Bool = false)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers public class MKPTimeChangedEvent : MKPlayer.MKPEvent {
+  final public let currentTime: Foundation.TimeInterval
+  override public var eventType: Swift.String {
+    get
+  }
+  public init(currentTime: Foundation.TimeInterval)
+  @objc deinit
+}
+@objc @_inheritsConvenienceInitializers public class MKPStallStartedEvent : MKPlayer.MKPEvent {
+  override public var eventType: Swift.String {
+    get
+  }
+  @objc override dynamic public init()
+  @objc deinit
+}
+extension MKPlayer.MKPProgramRestriction : Swift.Equatable {}
+extension MKPlayer.MKPProgramRestriction : Swift.Hashable {}
+extension MKPlayer.MKPProgramRestriction : Swift.RawRepresentable {}
+extension MKPlayer.MKPTimeMode : Swift.Equatable {}
+extension MKPlayer.MKPTimeMode : Swift.Hashable {}
+extension MKPlayer.MKPTimeMode : Swift.RawRepresentable {}
+extension MKPlayer.MKPAdQuartile : Swift.Equatable {}
+extension MKPlayer.MKPAdQuartile : Swift.Hashable {}
+extension MKPlayer.MKPAdQuartile : Swift.RawRepresentable {}
+extension MKPlayer.MKPMediaSourceType : Swift.Equatable {}
+extension MKPlayer.MKPMediaSourceType : Swift.Hashable {}
+extension MKPlayer.MKPMediaSourceType : Swift.RawRepresentable {}
+extension MKPlayer.MKPTimelineReferencePoint : Swift.Equatable {}
+extension MKPlayer.MKPTimelineReferencePoint : Swift.Hashable {}
+extension MKPlayer.MKPTimelineReferencePoint : Swift.RawRepresentable {}
+extension MKPlayer.MKPTrackType : Swift.Equatable {}
+extension MKPlayer.MKPTrackType : Swift.Hashable {}
+extension MKPlayer.MKPTrackType : Swift.RawRepresentable {}
+extension MKPlayer.MKPMetadataType : Swift.Equatable {}
+extension MKPlayer.MKPMetadataType : Swift.Hashable {}
+extension MKPlayer.MKPMetadataType : Swift.RawRepresentable {}
+extension MKPlayer.MKPScalingMode : Swift.Equatable {}
+extension MKPlayer.MKPScalingMode : Swift.Hashable {}
+extension MKPlayer.MKPScalingMode : Swift.RawRepresentable {}
